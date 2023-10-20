@@ -1,0 +1,26 @@
+{% extends 'mailling/base.html' %}
+{% load my_tags %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-12 mb-5">
+            <a class="btn btn-primary" href="{% url 'blog:blog_create' %}">Написать Статью</a>
+        </div>
+        {% for object in object_list %}
+            <div class="col-md-4">
+                <div class="card mb-4 box-shadow">
+                    <img class="card-img-top"
+                         src="{{object.preview|mymedia}}"
+                         alt="Card image cap">
+                    <div class="card-body">
+                        <p class="card-text">{{ object.title|title }}</p>
+                        <span class="text-muted">{{ object.content|default:"-"|truncatechars:100 }}</span><br>
+                    </div>
+                    <div class="card-footer">
+                        <a class="btn btn-lg btn-block btn-outline-primary" href="{% url 'blog:blog_view' object.pk %}">Посмотреть</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

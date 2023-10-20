@@ -1,0 +1,23 @@
+{% extends 'mailling/base.html' %}
+{% load my_tags %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card mb-4 box-shadow">
+                <img class="card-img-top"
+                     src="{{ object.preview|mymedia }}"
+                     alt="Card image cap">
+                <div class="card-body">
+                    <p class="card-text">{{ object.title }}</p>
+                    <p class="card-text">{{ object.content }}</p>
+                </div>
+                <div class="card-footer">
+                    <a class="btn btn-primary" href="{% url 'blog:blog_edit' object.pk %}">Изменить</a>
+                    <a class="btn btn-danger float-right" href="{% url 'blog:blog_delete' object.pk %}">Удалить</a><br>
+                    <span class="text-muted">Просмотры: {{ object.views }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

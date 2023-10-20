@@ -1,0 +1,67 @@
+[
+  {
+    "model": "blog.blog",
+    "pk": 1,
+    "fields": {
+      "title": "НАПИСАНИЕ ПИСЬМА: ОСНОВНЫЕ ПРАВИЛА",
+      "slug": "napisanie-pisma-osnovnyie-pravila",
+      "content": "Независимо от формы создания – электронной или рукописной – необходимо знать базовые правила и требования к написанию и оформлению письма.\r\n\r\nВо-первых, перед написанием письма следует определиться с разновидностью будущей переписки, ведь она бывает официальной, полуофициальной и дружественной.\r\n\r\nВо-вторых, тематика дальнейшего высказывания: продумайте содержание письма, подберите соответствующее приветствие и стиль текста.\r\n\r\nВ-третьих, почерк и речь. Если вы пишете письмо от руки, важно, чтобы почерк был аккуратным и разборчивым. Вещание тоже советуют не усложнять: выражайтесь доступно и грамотно, без сложных конструкций и оборотов.\r\n\r\nНаконец, «упаковка». Если письмо рукописное, наилучший вариант его оформления – белый конверт. Он будет уместен для любой разновидности и стиля переписки. Цветные конверты оставьте для непринужденного дружеского общения.",
+      "preview": "blog/письмо.jpg",
+      "date_of_creation": "2023-10-13T21:00:00Z",
+      "is_published": true,
+      "views": 10
+    }
+  },
+  {
+    "model": "blog.blog",
+    "pk": 2,
+    "fields": {
+      "title": "Test#4",
+      "slug": "test4",
+      "content": "TestTestTestTest",
+      "preview": "",
+      "date_of_creation": "2023-10-13T21:00:00Z",
+      "is_published": true,
+      "views": 0
+    }
+  },
+  {
+    "model": "blog.blog",
+    "pk": 3,
+    "fields": {
+      "title": "Test#3",
+      "slug": "test3",
+      "content": "TestTestTest",
+      "preview": "",
+      "date_of_creation": null,
+      "is_published": true,
+      "views": 0
+    }
+  },
+  {
+    "model": "blog.blog",
+    "pk": 4,
+    "fields": {
+      "title": "Test#2",
+      "slug": "test2",
+      "content": "TestTest",
+      "preview": "",
+      "date_of_creation": null,
+      "is_published": true,
+      "views": 2
+    }
+  },
+  {
+    "model": "blog.blog",
+    "pk": 5,
+    "fields": {
+      "title": "Test#1",
+      "slug": "test1",
+      "content": "Test",
+      "preview": "",
+      "date_of_creation": null,
+      "is_published": true,
+      "views": 0
+    }
+  }
+]
