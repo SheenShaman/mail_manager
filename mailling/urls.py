@@ -9,7 +9,7 @@ from mailling.views import (MainView, MaillingCreateView, MaillingListView, Mail
 app_name = MaillingConfig.name
 
 urlpatterns = [
-    path('', MainView.as_view(), name='main'),
+    path('', cache_page(60)(MainView.as_view()), name='main'),
     path('mailling/create/', MaillingCreateView.as_view(), name='mailling_create'),
     path('maillings/', MaillingListView.as_view(), name='maillings'),
     path('mailling/detail/<int:pk>', MaillingDetailView.as_view(), name='mailling_detail'),

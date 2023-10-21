@@ -5,7 +5,7 @@ from mailling.models import Mailling, Message, Client, Logs
 
 @admin.register(Mailling)
 class MaillingAdmin(admin.ModelAdmin):
-    list_display = ('time_to_start', 'time_to_end', 'periodicity', 'status',)
+    list_display = ('time_to_send', 'periodicity', 'status',)
     list_filter = ('status', 'periodicity',)
 
 

@@ -14,8 +14,7 @@ class Mailling(models.Model):
         ('MONTHLY', 'Каждый месяц'),
     )
 
-    time_to_start = models.DateTimeField(verbose_name='Время начало отправки', default=timezone.now)
-    time_to_end = models.DateTimeField(verbose_name='Время окончания отправки')
+    time_to_send = models.TimeField(verbose_name='Время начало отправки', default=timezone.now)
     periodicity = models.CharField(max_length=50, verbose_name='Периодичность', choices=PERIOD)
     status = models.BooleanField(max_length=20, verbose_name='Пуск рассылки', default=False)
 
@@ -26,7 +25,7 @@ class Mailling(models.Model):
     )
 
     def __str__(self):
-        return f'{self.time_to_start} - {self.time_to_end} ({self.periodicity})'
+        return f'{self.time_to_send} {self.periodicity} {self.status} {self.client} {self.message}'
 
     class Meta:
         verbose_name = "Настройка"
@@ -38,7 +37,7 @@ class Message(models.Model):
     body = models.TextField(verbose_name='Сообщение')
 
     owner = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE,verbose_name='Пользователь', **NULLABLE
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name='Пользователь', **NULLABLE
     )
 
     def __str__(self):

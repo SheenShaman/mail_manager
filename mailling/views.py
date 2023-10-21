@@ -3,13 +3,11 @@ import random
 from django.http import Http404
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView, CreateView, ListView, DetailView, UpdateView, DeleteView
-from config.settings import CACHE_ENABLED
-from django.core.cache import cache
 
 from blog.models import Blog
 from mailling.forms import MaillingForm, MessageForm, ClientForm
 from mailling.models import Mailling, Message, Client, Logs
-from mailling.services import send_mailling
+from mailling.services import send_mailling, task, get_cache_clients, get_cache_messages
 
 
 class MainView(TemplateView):
@@ -35,7 +33,7 @@ class MaillingCreateView(CreateView):
         self.object = form.save()
         self.object.owner = self.request.user
         self.object.save()
-        send_mailling(self.object)
+        task()
         return super().form_valid(form)
 
     def get_form_kwargs(self):
@@ -102,6 +100,7 @@ class MessageListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['object_list'] = get_cache_messages()
         context['title'] = 'Список сообщений'
         return context
 
@@ -145,20 +144,10 @@ class ClientListView(ListView):
     model = Client
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['title'] = 'Список клиентов'
-        return context
-
-    def cache_example(self):
-        if CACHE_ENABLED:
-            key = f'client_list'
-            client_list = cache.get(key)
-            if client_list is None:
-                client_list = self.objects.all()
-                cache.set(key, client_list)
-            else:
-                client_list = Client.objects.all()
-            return client_list
+        context_data = super().get_context_data(**kwargs)
+        context_data['object_list'] = get_cache_clients()
+        context_data['title'] = 'Список клиентов'
+        return context_data
 
 
 class ClientUpdateView(UpdateView):
