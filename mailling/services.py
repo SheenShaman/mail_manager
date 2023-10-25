@@ -59,21 +59,3 @@ def send_mailling(mailling):
             )
             log.save()
             return log
-
-
-def task():
-
-    daily = 'DAILY'
-    weekly = 'WEEKLY'
-    monthly = 'MONTHLY'
-
-    for m in Mailling.objects.all().filter(
-        # time_to_send=datetime.now().time().hour + 1,
-        # time_to_end=datetime.now().time().hour,
-        periodicity=daily,
-        status=True
-    ):
-        print('Hello!')
-        send_mailling(m)
-
-

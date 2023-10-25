@@ -1,50 +1,84 @@
-import sys
+import logging
 
-from django.core.management import BaseCommand
+from django.conf import settings
 
-from mailling.models import Mailling
-from mailling.services import send_mailling
-from config.mailling_scheduler import scheduler
-from django.utils import timezone
+from apscheduler.schedulers.blocking import BlockingScheduler
+from apscheduler.triggers.cron import CronTrigger
+from django.core.management.base import BaseCommand
+from django_apscheduler.jobstores import DjangoJobStore
+from django_apscheduler.models import DjangoJobExecution
+from django_apscheduler import util
+
+from mailling.tasks import daily_tasks, weekly_tasks, monthly_tasks, tasks
+
+logger = logging.getLogger(__name__)
 
 
-def my_job():
-    mailling = Mailling.objects.all()
-    return send_mailling(mailling)
+@util.close_old_connections
+def delete_old_job_executions(max_age=604_800):
+    DjangoJobExecution.objects.delete_old_job_executions(max_age)
 
 
 class Command(BaseCommand):
-    # help = ""
+    help = "Runs APScheduler."
 
     def handle(self, *args, **options):
-        if Mailling.status:
-            if Mailling.PERIOD == 'DAILY':
-                return scheduler.add_job(my_job, 'interval', hours=24, name='send_mailling', jobstore='default')
-            elif Mailling.PERIOD == 'WEEKLY':
-                return scheduler.add_job(my_job, 'interval', hours=168, name='send_mailling', jobstore='default')
-            elif Mailling.PERIOD == 'MONTHLY':
-                return scheduler.add_job(my_job, 'interval', hours=720, name='send_mailling', jobstore='default')
+        scheduler = BlockingScheduler(timezone=settings.TIME_ZONE)
+        scheduler.add_jobstore(DjangoJobStore(), "default")
+
+        # scheduler.add_job(
+        #     tasks,
+        #     trigger=CronTrigger(minute="*/1"),  # Every minute
+        #     id="my_job",
+        #     max_instances=1,
+        #     replace_existing=True,
+        # )
+        # logger.info("Added job 'daily_tasks'.")
+
+        scheduler.add_job(
+            daily_tasks,
+            trigger=CronTrigger(hour="*/23"),  # Every day
+            id="daily_job",
+            max_instances=1,
+            replace_existing=True,
+        )
+        logger.info("Added job 'daily_tasks'.")
+
+        scheduler.add_job(
+            weekly_tasks,
+            trigger=CronTrigger(day_of_week="*/1"),  # Every monday
+            id="weekly_job",
+            max_instances=1,
+            replace_existing=True,
+        )
+        logger.info("Added job 'weekly_tasks'.")
+
+        scheduler.add_job(
+            monthly_tasks,
+            trigger=CronTrigger(day="*/30"),  # Every month
+            id="monthly_job",
+            max_instances=1,
+            replace_existing=True,
+        )
+        logger.info("Added job 'monthly_tasks'.")
+
+        scheduler.add_job(
+            delete_old_job_executions,
+            trigger=CronTrigger(
+                day_of_week="mon", hour="00", minute="00"
+            ),  # Midnight on Monday, before start of the next work week.
+            id="delete_old_job_executions",
+            max_instances=1,
+            replace_existing=True,
+        )
+        logger.info(
+            "Added weekly job: 'delete_old_job_executions'."
+        )
+
+        try:
+            logger.info("Starting scheduler...")
             scheduler.start()
-            print("Scheduler started...", file=sys.stdout)
-        elif Mailling.status is False:
-            scheduler.pause()
-
-        if Mailling.time_to_end == timezone.now():
-            scheduler.pause_job(my_job())
-
-
-# def start():
-#     if Mailling.status:
-#         if Mailling.PERIOD == 'DAILY':
-#             return scheduler.add_job(my_job, 'interval', hours=24, name='send_mailings', jobstore='default')
-#         elif Mailling.PERIOD == 'WEEKLY':
-#             return scheduler.add_job(my_job, 'interval', day=168, name='send_mailings', jobstore='default')
-#         elif Mailling.PERIOD == 'MONTHLY':
-#             return scheduler.add_job(my_job, 'interval', hours=720, name='send_mailings', jobstore='default')
-#         scheduler.start()
-#         print("Scheduler started...", file=sys.stdout)
-#     elif Mailling.status is False:
-#         scheduler.pause()
-#
-#     if Mailling.time_to_end == timezone.now():
-#         scheduler.pause_job(my_job())
+        except KeyboardInterrupt:
+            logger.info("Stopping scheduler...")
+            scheduler.shutdown()
+            logger.info("Scheduler shut down successfully!")

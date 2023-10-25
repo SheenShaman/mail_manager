@@ -7,7 +7,7 @@ from django.views.generic import TemplateView, CreateView, ListView, DetailView,
 from blog.models import Blog
 from mailling.forms import MaillingForm, MessageForm, ClientForm
 from mailling.models import Mailling, Message, Client, Logs
-from mailling.services import send_mailling, task, get_cache_clients, get_cache_messages
+from mailling.services import send_mailling, get_cache_clients, get_cache_messages
 
 
 class MainView(TemplateView):
@@ -33,7 +33,6 @@ class MaillingCreateView(CreateView):
         self.object = form.save()
         self.object.owner = self.request.user
         self.object.save()
-        task()
         return super().form_valid(form)
 
     def get_form_kwargs(self):
