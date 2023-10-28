@@ -9,17 +9,22 @@
             </div>
             <div class="card-body">
                 <p class="card-text">Сообщение: {{object.message.body}}</p>
-                <p class="card-text">Пользователь: {{object.owner|default:'Неизвестный пользователь'}}</p>
-                <p class="card-text">Время рассылки: {{ object.time_to_start}} - {{ object.time_to_end}}</p>
+                <p class="card-text">Пользователь: {{object.user|default:'Неизвестный пользователь'}}</p>
+                <p class="card-text">Время рассылки: {{ object.start_to_send}} - {{ object.stop_to_send}}</p>
                 <p class="card-text">Периодичность: {{ object.periodicity}}</p>
-                <p class="card-text">Статус: {{object.status }}</p>
+                {% if object.is_active %}
+                    <p class="card-text">Статус: Активна</p>
+                {% else %}
+                    <p class="card-text">Статус: Неактивна</p>
+                {% endif %}
                 <p class="card-text">КОМУ:
                     {% for client in object.client.all %}
                         <p class="card-text">{{client}}</p>
                     {% endfor %}
-                <a href="{% url 'mailling:maillings' %}" type="button" class="btn btn-sm btn-outline-secondary">Назад</a>
+                <a href="{% url 'mailling:maillings' %}" type="button"
+                   class="btn btn-sm btn-outline-secondary">Назад</a>
             </div>
         </div>
-      </div>
+    </div>
 </div>
 {% endblock %}

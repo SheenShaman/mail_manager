@@ -14,21 +14,21 @@ class MaillingForm(StyleFormMixin, forms.ModelForm):
     def __init__(self, *args, **kwargs):
         uid = kwargs.pop('uid')
         super().__init__(*args, **kwargs)
-        self.fields['client'].queryset = Client.objects.filter(owner=uid)
-        self.fields['message'].queryset = Message.objects.filter(owner=uid)
+        self.fields['client'].queryset = Client.objects.filter(user=uid)
+        self.fields['message'].queryset = Message.objects.filter(user=uid)
 
     class Meta:
         model = Mailling
-        exclude = ('owner',)
+        exclude = ('user',)
 
 
 class MessageForm(StyleFormMixin, forms.ModelForm):
     class Meta:
         model = Message
-        exclude = ('owner',)
+        exclude = ('user',)
 
 
 class ClientForm(StyleFormMixin, forms.ModelForm):
     class Meta:
         model = Client
-        exclude = ('owner',)
+        exclude = ('user',)

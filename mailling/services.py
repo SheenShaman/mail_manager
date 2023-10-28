@@ -1,10 +1,11 @@
-from datetime import datetime, timezone
 from smtplib import SMTPException
-from django.core.mail import send_mail
-from mailling.models import Logs, Mailling, Client, Message
-from django.conf import settings
-from django.core.cache import cache
 
+from django.core.mail import send_mail
+from django.core.cache import cache
+from django.conf import settings
+from django.utils import timezone
+
+from mailling.models import Logs, Client, Message
 
 def get_cache_clients():
     if settings.CACHE_ENABLED:
@@ -31,31 +32,34 @@ def get_cache_messages():
 
 
 def send_mailling(mailling):
-    for client in mailling.client.all():
-        try:
-            send_mail(
-                mailling.message.head,
-                mailling.message.body,
-                settings.EMAIL_HOST_USER,
-                recipient_list=[client],
-                fail_silently=False
-            )
-            log = Logs.objects.create(
-                last_try=mailling.time_to_send,
-                status_try='Успешно',
-                mailling=mailling,
-                client=client.email
-            )
-            log.save()
-            return log
+    now = timezone.localtime(timezone.now())
 
-        except SMTPException as error:
-            log = Logs.objects.create(
-                last_try=mailling.time_to_send,
-                status_try='Ошибка',
-                mailling=mailling,
-                client=client.email,
-                answer=error
-            )
-            log.save()
-            return log
+    if mailling.start_to_send <= now <= mailling.stop_to_send:
+        for client in mailling.client.all():
+            try:
+                send_mail(
+                    mailling.message.head,
+                    mailling.message.body,
+                    settings.EMAIL_HOST_USER,
+                    recipient_list=[client],
+                    fail_silently=False
+                )
+                log = Logs.objects.create(
+                    last_try=mailling.start_to_send,
+                    status_try='Успешно',
+                    mailling=mailling,
+                    client=client.email
+                )
+                log.save()
+                return log
+
+            except SMTPException as error:
+                log = Logs.objects.create(
+                    last_try=mailling.time_to_send,
+                    status_try='Ошибка',
+                    mailling=mailling,
+                    client=client.email,
+                    answer=error
+                )
+                log.save()
+                return log

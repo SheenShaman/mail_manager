@@ -9,7 +9,7 @@ from django_apscheduler.jobstores import DjangoJobStore
 from django_apscheduler.models import DjangoJobExecution
 from django_apscheduler import util
 
-from mailling.tasks import daily_tasks, weekly_tasks, monthly_tasks, tasks
+from mailling.tasks import daily_tasks, weekly_tasks, monthly_tasks
 
 logger = logging.getLogger(__name__)
 
@@ -26,23 +26,14 @@ class Command(BaseCommand):
         scheduler = BlockingScheduler(timezone=settings.TIME_ZONE)
         scheduler.add_jobstore(DjangoJobStore(), "default")
 
-        # scheduler.add_job(
-        #     tasks,
-        #     trigger=CronTrigger(minute="*/1"),  # Every minute
-        #     id="my_job",
-        #     max_instances=1,
-        #     replace_existing=True,
-        # )
-        # logger.info("Added job 'daily_tasks'.")
-
         scheduler.add_job(
             daily_tasks,
-            trigger=CronTrigger(hour="*/23"),  # Every day
+            trigger=CronTrigger(hour="*/10"),  # Every day
             id="daily_job",
             max_instances=1,
             replace_existing=True,
         )
-        logger.info("Added job 'daily_tasks'.")
+        logger.info("Added job 'daily_job'.")
 
         scheduler.add_job(
             weekly_tasks,
@@ -51,7 +42,7 @@ class Command(BaseCommand):
             max_instances=1,
             replace_existing=True,
         )
-        logger.info("Added job 'weekly_tasks'.")
+        logger.info("Added job 'weekly_job'.")
 
         scheduler.add_job(
             monthly_tasks,
@@ -60,7 +51,7 @@ class Command(BaseCommand):
             max_instances=1,
             replace_existing=True,
         )
-        logger.info("Added job 'monthly_tasks'.")
+        logger.info("Added job 'monthly_job'.")
 
         scheduler.add_job(
             delete_old_job_executions,
