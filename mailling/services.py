@@ -7,6 +7,7 @@ from django.utils import timezone
 
 from mailling.models import Logs, Client, Message
 
+
 def get_cache_clients():
     if settings.CACHE_ENABLED:
         key = 'client_list'
@@ -33,7 +34,6 @@ def get_cache_messages():
 
 def send_mailling(mailling):
     now = timezone.localtime(timezone.now())
-
     if mailling.start_to_send <= now <= mailling.stop_to_send:
         for client in mailling.client.all():
             try:

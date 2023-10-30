@@ -67,7 +67,7 @@ class MaillingDetailView(LoginRequiredMixin, DetailView):
         return self.object
 
 
-class MaillingUpdateView(LoginRequiredMixin, PermissionRequiredMixin,  UpdateView):
+class MaillingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     model = Mailling
     form_class = MaillingForm
     success_url = reverse_lazy('mailling:maillings')
